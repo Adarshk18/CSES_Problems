@@ -1,85 +1,88 @@
-/*
-    author: kartik8800
-*/
- 
-#include<bits/stdc++.h>
-#define ll long long
-#define pb push_back
-#define fr(a,b) for(int i = a; i < b; i++)
-#define rep(i,a,b) for(int i = a; i < b; i++)
-#define mod 1000000007
-#define inf (1LL<<60)
-#define all(x) (x).begin(), (x).end()
-#define prDouble(x) cout << fixed << setprecision(10) << x
-#define triplet pair<ll,pair<ll,ll>>
-#define fast_io ios_base::sync_with_stdio(false);cin.tie(NULL)
+#include <bits/stdc++.h>
 using namespace std;
  
-vector<int> tree[200001];
-int dp[200001][2];
+const int N = 200001;
+vector<int> adj[N];
+int c[N];
+int maxd[N];
+int maxd2[N];
  
-void solve(int src, int par)
+void dfs1(int v, int p)
 {
-    vector<int> prefix, suffix;
-    dp[src][0] = dp[src][1] = 0;
- 
-    bool leaf = 1;
-    for(int child : tree[src])
+  maxd[v] = 0;
+ maxd2[v] = 0;
+ for (auto x : adj[v])
+  {
+   if (x == p) continue;
+ dfs1(x, v);
+  if (maxd[x] + 1 > maxd[v])
     {
-        if(child != par)
-        {
-            leaf = 0;
-            solve(child, src);
-        }
+maxd2[v] = maxd[v];
+  maxd[v] = maxd[x] + 1;
+ c[v] = x;
+   
+    }
+    else if (maxd[x] + 1 > maxd2[v])
+    {
+  maxd2[v] = maxd[x] + 1;
+ 
     }
  
-    if(leaf)return;
-    for(int child : tree[src])
-    {
-        if(child != par)
-        {
-            prefix.push_back(max(dp[child][0], dp[child][1]));
-            suffix.push_back(max(dp[child][0], dp[child][1]));
-        }
-    }
- 
-    fr(1,(int)prefix.size())
-        prefix[i] += prefix[i-1];
-    for(int i = (int)suffix.size() - 2; i >= 0; i--)
-        suffix[i] += suffix[i+1];
- 
-    dp[src][0] = suffix[0];
-    int c_no = 0;
-    for(int child : tree[src])
-    {
-        if(child == par)continue;
- 
-        int leftChildren = (c_no == 0) ? 0 : prefix[c_no - 1];
-        int rightChildren = (c_no == (int)suffix.size() - 1) ? 0 : suffix[c_no + 1];
- 
-        dp[src][1] = max(dp[src][1], 1 + leftChildren + rightChildren + dp[child][0]);
-        c_no++;
-    }
+  }
 }
  
-int main() {
-   fast_io;
-   ll t,n,m,x,i,j,k,q;
-   //cin >> t;
-   t = 1;
-   while(t--)
-   {
-        cin >> n;
-        vector<int> ans(n+1);
-        fr(2,n+1)
-        {
-            int u,v;
-            cin >> u >> v;
-            tree[u].push_back(v);
-            tree[v].push_back(u);
-        }
-        solve(1, 0);
-        cout << max(dp[1][0], dp[1][1]);
-   }
-   return 0;
+void dfs2(int v, int p)
+{
+ for (auto x : adj[v])
+  {
+if (x == p) continue;
+if (c[v] == x)
+    {
+if (maxd[x] < maxd2[v] + 1)
+      {
+    maxd2[x] = maxd[x];
+    maxd[x] = maxd2[v] + 1;
+     c[x] = v;
+        
+      }
+      else
+      {
+        maxd2[x] = max(maxd2[x], maxd2[v] + 1);
+      
+      }
+  
+    }
+    else
+    {
+      maxd2[x] = maxd[x];
+      maxd[x] = maxd[v] + 1;
+     c[x] = v;
+      
+    }
+    dfs2(x, v);
+    
+  }
+}
+ 
+int main()
+{
+ 
+  int n, u, v;
+  cin >> n;
+ 
+  for (int i = 0; i < n - 1; i++)
+  {
+   cin >> u >> v;
+   adj[u].push_back(v);
+    adj[v].push_back(u);
+  }
+ 
+  dfs1(1, 0);
+  dfs2(1, 0);
+ 
+  for (int i = 1; i <= n; i++)
+  {
+    cout << maxd[i] << " ";
+  }
+  return 0;
 }
