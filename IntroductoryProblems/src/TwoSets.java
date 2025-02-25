@@ -28,7 +28,7 @@ public class TwoSets {
                 }
             }
 
-            //print the first set
+            //print the first set and its size
             pw.println(setA.size());
             for(int num: setA){
                 pw.print(num + " ");
