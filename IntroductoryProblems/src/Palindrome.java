@@ -1,30 +1,50 @@
 import java.io.*;
 import java.util.*;
 
+
 public class Palindrome {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException{
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         PrintWriter pw = new PrintWriter(System.out);
 
-        int t = Integer.parseInt(br.readLine());
+        String s = br.readLine();
 
-        while (t-- > 0) {
-            String line = br.readLine();
-            if (line == null) {
-                break; // Exit if there is no more input
-            }
-            StringTokenizer st = new StringTokenizer(line);
-            int a = Integer.parseInt(st.nextToken());
-            int b = Integer.parseInt(st.nextToken());
+        int[] freq = new int[26];
+        for(char c: s.toCharArray()){
+            freq[c-'A']++;
+        }
 
-            // Check if the total coins are divisible by 3 and the maximum value is not greater than twice the minimum value
-            if ((a + b) % 3 == 0 && Math.max(a, b) <= 2 * Math.min(a, b)) {
-                pw.println("YES");
-            } else {
-                pw.println("NO"); // Use println instead of print
+        int oddCount =0;
+        char oddChar = '\0';
+        for(int i=0; i<26; i++){
+            if(freq[i]%2!=0){
+                oddCount++;
+                oddChar = (char) (i+'A');
             }
         }
 
+        if(oddCount>1){
+            pw.println("NO SOLUTION");
+        }else{
+            StringBuilder left = new StringBuilder();
+
+            for (int i = 0; i < 26; i++) {
+                if(freq[i]>1){
+                    char c = (char) (i+'A');
+                    int cnt = freq[i]/2;
+                    left.append(String.valueOf(c).repeat(cnt));
+                }
+            }
+
+            StringBuilder right = new StringBuilder(left).reverse();
+
+            if (oddCount==1){
+                left.append(oddChar);
+            }
+
+            left.append(right);
+            pw.println(left.toString());
+        }
         pw.flush();
         pw.close();
     }
