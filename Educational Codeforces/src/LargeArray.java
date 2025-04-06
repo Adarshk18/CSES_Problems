@@ -1,53 +1,52 @@
-import java.io.*;
 import java.util.*;
 
 public class LargeArray {
-    public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        PrintWriter pw = new PrintWriter(System.out);
 
-        int t = Integer.parseInt(br.readLine().trim()); // Number of test cases
+    static void solveQuery(Scanner sc) {
+        int n = sc.nextInt();
+        long k = sc.nextLong();
+        long x = sc.nextLong();
 
-        while (t-- > 0) {
-            StringTokenizer st = new StringTokenizer(br.readLine());
-            int n = Integer.parseInt(st.nextToken());
-            int k = Integer.parseInt(st.nextToken());
-            long x = Long.parseLong(st.nextToken());
-
-            int[] a = new int[n];
-            st = new StringTokenizer(br.readLine());
-            long[] prefix = new long[n + 1];
-
-            // Compute prefix sum for array `a`
-            for (int i = 0; i < n; i++) {
-                a[i] = Integer.parseInt(st.nextToken());
-                prefix[i + 1] = prefix[i] + a[i];
-            }
-
-            long sumA = prefix[n]; // Total sum of one complete cycle of `a`
-            long totalB = sumA * k; // Total sum of full `b`
-
-            // If even full `b` doesn't reach `x`, answer is 0
-            if (totalB < x) {
-                pw.println(0);
-                continue;
-            }
-
-            int count = 0;
-            for (int l = 0; l < n * k; l++) {
-                long sum = 0;
-                for (int r = l; r < n * k; r++) {
-                    sum += a[r % n]; // Cyclic array simulation
-                    if (sum >= x) {
-                        count += (n * k - r);
-                        break;
-                    }
-                }
-            }
-
-            pw.println(count);
+        long[] a = new long[n];
+        long sum = 0;
+        for (int i = 0; i < n; i++) {
+            a[i] = sc.nextLong();
+            sum += a[i];
         }
-        pw.flush();
-        pw.close();
+
+        if (x > k * sum) {
+            System.out.println(0);
+            return;
+        }
+
+        long xm = x % sum;
+        long q = x / sum;
+        if (xm == 0) {
+            q--;
+            xm = sum;
+        }
+
+        long ans = n * k - q * n;
+        long suf = 0;
+        for (int i = n - 1; i >= 0; i--) {
+            suf += a[i];
+            if (suf >= xm)
+                break;
+            ans--;
+        }
+
+        System.out.println(ans);
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        int t = 1;
+        t = sc.nextInt();
+        while (t-- > 0) {
+            solveQuery(sc);
+        }
+
+        sc.close();
     }
 }

@@ -5,9 +5,8 @@ public class MovingRobots {
         Scanner scanner = new Scanner(System.in);
         int k = scanner.nextInt();
         int n = 8;
-        double[][][][] dp = new double[n][n][n][n]; // dp[x][y][i][j] is probability robot starting at (x,y) is at (i,j) after k steps
+        double[][][][] dp = new double[n][n][n][n];
 
-        // Initialize for step 0: each robot is at its starting position with probability 1.0
         for (int x = 0; x < n; x++) {
             for (int y = 0; y < n; y++) {
                 dp[x][y][x][y] = 1.0;
