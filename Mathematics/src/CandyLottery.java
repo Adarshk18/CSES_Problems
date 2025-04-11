@@ -13,7 +13,7 @@ public class CandyLottery {
             expected += x * prob;
         }
 
-        expected = Math.round(expected * 1e6) / 1e6;
+        expected = Math.round(expected * 1e6 + 0.5) / 1e6;
         System.out.printf("%.6f\n", expected);
     }
 }
