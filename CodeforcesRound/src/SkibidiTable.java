@@ -1,95 +1,84 @@
-import java.io.*;
 import java.util.*;
 
 public class SkibidiTable {
 
-    interface FindXY {
-        int apply(int x, int y, int sz, int value);
-    }
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
 
-    interface FindD {
-        int[] apply(int x, int y, int sz, int value);
-    }
-
-    public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st;
-
-        int t = Integer.parseInt(br.readLine());
-
+        int t = sc.nextInt();  // number of test cases
         while (t-- > 0) {
-            st = new StringTokenizer(br.readLine());
-            int n = Integer.parseInt(st.nextToken());
-            int q = Integer.parseInt(st.nextToken());
+            int n = sc.nextInt();          // size exponent
+            int q = sc.nextInt();          // number of queries
+            int size = 1 << n;             // grid size = 2^n
 
             while (q-- > 0) {
-                // Read a new line for each query
-                st = new StringTokenizer(br.readLine());
-                String type = st.nextToken();
-
+                String type = sc.next();
                 if (type.equals("->")) {
-                    int r = Integer.parseInt(st.nextToken());
-                    int c = Integer.parseInt(st.nextToken());
-
-                    int finalR = r;
-                    int finalC = c;
-
-                    FindXY[] findXY = new FindXY[1];
-                    findXY[0] = (x, y, sz, value) -> {
-                        if (sz == 1) {
-                            assert finalR == x && finalC == y;
-                            return value;
-                        }
-
-                        int subTotal = (sz * sz) / 4;
-                        int nsz = sz / 2;
-                        int[] dx = {0, nsz, nsz, 0};
-                        int[] dy = {0, nsz, 0, nsz};
-
-                        for (int i = 0; i < 4; i++) {
-                            int nx = x + dx[i];
-                            int ny = y + dy[i];
-
-                            if (finalR >= nx && finalR < nx + nsz && finalC >= ny && finalC < ny + nsz) {
-                                int nvalue = value + subTotal * i;
-                                return findXY[0].apply(nx, ny, nsz, nvalue);
-                            }
-                        }
-                        return -1;
-                    };
-
-                    System.out.println(findXY[0].apply(1, 1, 1 << n, 1));
+                    int r = sc.nextInt();
+                    int c = sc.nextInt();
+                    System.out.println(iterativeFindXY(n, r, c));
                 } else {
-                    int d = Integer.parseInt(st.nextToken());
-
-                    FindD[] findD = new FindD[1];
-                    findD[0] = (x, y, sz, value) -> {
-                        if (sz == 1) {
-                            assert d == value;
-                            return new int[]{x, y};
-                        }
-
-                        int subTotal = (sz * sz) / 4;
-                        int nsz = sz / 2;
-
-                        for (int i = 0; i < 4; i++) {
-                            int nvalue = value + subTotal * i;
-                            if (d >= nvalue && d < nvalue + subTotal) {
-                                switch (i) {
-                                    case 0: return findD[0].apply(x, y, nsz, nvalue);
-                                    case 1: return findD[0].apply(x + nsz, y + nsz, nsz, nvalue);
-                                    case 2: return findD[0].apply(x + nsz, y, nsz, nvalue);
-                                    case 3: return findD[0].apply(x, y + nsz, nsz, nvalue);
-                                }
-                            }
-                        }
-                        return new int[]{-1, -1};
-                    };
-
-                    int[] res = findD[0].apply(1, 1, 1 << n, 1);
+                    int d = sc.nextInt();
+                    int[] res = iterativeFindD(n, d);
                     System.out.println(res[0] + " " + res[1]);
                 }
             }
         }
+        sc.close();
+    }
+
+    static int iterativeFindXY(int n, int r, int c) {
+        int value = 1;
+        int x = 1, y = 1;
+        int size = 1 << n;
+
+        for (int level = n; level > 0; level--) {
+            int half = size >> 1;
+            int subTotal = (size * size) / 4;
+            int quadrant = 0;
+
+            if (r >= x + half && c >= y + half) {
+                quadrant = 1;
+                x += half;
+                y += half;
+            } else if (r >= x + half && c < y + half) {
+                quadrant = 2;
+                x += half;
+            } else if (r < x + half && c >= y + half) {
+                quadrant = 3;
+                y += half;
+            } // else quadrant 0, stays in top-left
+
+            value += subTotal * quadrant;
+            size = half;
+        }
+
+        return value;
+    }
+
+    static int[] iterativeFindD(int n, int d) {
+        int value = 1;
+        int x = 1, y = 1;
+        int size = 1 << n;
+
+        for (int level = n; level > 0; level--) {
+            int half = size >> 1;
+            int subTotal = (size * size) / 4;
+            int quadrant = (d - value) / subTotal;
+
+            if (quadrant == 1) {
+                x += half;
+                y += half;
+            } else if (quadrant == 2) {
+                x += half;
+            } else if (quadrant == 3) {
+                y += half;
+            }
+
+            value += subTotal * quadrant;
+            size = half;
+        }
+
+        return new int[]{x, y};
     }
 }
