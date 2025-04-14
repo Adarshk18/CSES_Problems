@@ -8,18 +8,18 @@ public class Bobritto {
         int t = in.nextInt();
 
         for (int i = 0; i < t; i++) {
-            int n = in.nextInt();
-            int m = in.nextInt();
-            int l = in.nextInt();
-            int r = in.nextInt();
+            long n = in.nextLong();
+            long m = in.nextLong();
+            long l = in.nextLong();
+            long r = in.nextLong();
 
-            int spread = n-m;
+            long diff = (n-m);
 
-            int ls = l - spread;
-            int rs = r + spread;
-
-
-            System.out.println(ls + " " + rs);
+            if (Math.abs(l)>=diff){
+                System.out.println(l+diff + " " + r);
+            }else{
+                System.out.println(0 + " " + (r-l-diff));
+            }
         }
     }
 }
