@@ -8,23 +8,39 @@ public class Boneca {
         int t= in.nextInt();
 
         while(t-->0){
-            int n = in.nextInt();
-            int[] a = new int[n];
+            long n = in.nextLong();
+            long[] a = new long[(int)n];
+            for (int i = 0; i < n; i++) {
+                a[i] = in.nextLong();
+            }
+
+            long[] fr = new long[30];
+//            for (int i = 0; i < n; i++) {
+//                fr[i] = in.nextLong();
+//            }
+
 
             for (int i = 0; i < n; i++) {
-                a[i] = in.nextInt();
-            }
-
-            int max = 0;
-
-            for (int k = 0; k < n; k++) {
-                int curr = 0;
-                for (int i = 0; i < n; i++) {
-                    curr += (a[k] ^ a[i]);
+                for (int j = 0; j < 30; j++) {
+                    if ((a[i]&(1<<j))!=0){
+                        fr[j]++;
+                    }
                 }
-                max = Math.max(max,curr);
             }
-            System.out.println(max);
+            long ans =0;
+
+            for (int i = 0; i < n; i++) {
+                long sum =0;
+                for (int j = 0; j < 30; j++) {
+                    if((a[i]&(1<<j))!=0){
+                        sum += (1L<<j)*(n-fr[j]);
+                    }else{
+                        sum += (1L<<j)*fr[j];
+                    }
+                }
+                ans = Math.max(ans,sum);
+            }
+            System.out.println(ans);
         }
     }
 }
