@@ -3,9 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/CSES Problems.iml" filepath="$PROJECT_DIR$/.idea/CSES Problems.iml" />
-      <module fileurl="file://$PROJECT_DIR$/Codeforces Round 1006 Div3/Codeforces Round 1006 Div3.iml" filepath="$PROJECT_DIR$/Codeforces Round 1006 Div3/Codeforces Round 1006 Div3.iml" />
       <module fileurl="file://$PROJECT_DIR$/CodeforcesRound/CodeforcesRound.iml" filepath="$PROJECT_DIR$/CodeforcesRound/CodeforcesRound.iml" />
-      <module fileurl="file://$PROJECT_DIR$/Educational Codeforces/Educational Codeforces.iml" filepath="$PROJECT_DIR$/Educational Codeforces/Educational Codeforces.iml" />
       <module fileurl="file://$PROJECT_DIR$/IntroductoryProblems/IntroductoryProblems.iml" filepath="$PROJECT_DIR$/IntroductoryProblems/IntroductoryProblems.iml" />
       <module fileurl="file://$PROJECT_DIR$/Mathematics/Mathematics.iml" filepath="$PROJECT_DIR$/Mathematics/Mathematics.iml" />
     </modules>
