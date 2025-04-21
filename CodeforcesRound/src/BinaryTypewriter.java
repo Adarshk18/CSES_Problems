@@ -1,45 +1,48 @@
-import java.io.*;
+import java.util.*;
 
-public class BinaryTypewriter {
-    public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-        int t = Integer.parseInt(br.readLine());
+class MedianSplits {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int t = sc.nextInt(); // number of test cases
         while (t-- > 0) {
-            int n = Integer.parseInt(br.readLine());
-            String s = br.readLine();
+            int n = sc.nextInt();
+            int k = sc.nextInt();
+            int[] a = new int[n];
+            boolean hasK = false;
 
+            for (int i = 0; i < n; i++) {
+                a[i] = sc.nextInt();
+                if (a[i] == k) hasK = true;
+            }
 
-            int originalTransitions = 0;
-            for (int i = 1; i < n; i++) {
-                if (s.charAt(i) != s.charAt(i - 1)) {
-                    originalTransitions++;
+            // If no element is equal to k, then we can't form such a split
+            if (!hasK) {
+                System.out.println("NO");
+                continue;
+            }
+
+            // For n == 3, we just check directly
+            if (n == 3) {
+                int[] temp = Arrays.copyOf(a, n);
+                Arrays.sort(temp);
+                int median = temp[1];
+                System.out.println(median <= k ? "YES" : "NO");
+                continue;
+            }
+
+            boolean possible = false;
+            for (int i = 0; i < n - 1; i++) {
+                if (a[i] <= k && a[i + 1] <= k) {
+                    possible = true;
+                    break;
+                }
+                if (i + 2 < n && a[i] <= k && a[i + 2] <= k) {
+                    possible = true;
+                    break;
                 }
             }
-            int originalCost = n + originalTransitions;
-            if (s.charAt(0) == '1') {
-                originalCost += 1;
-            }
 
-
-            int bestCost = originalCost;
-            if (originalTransitions > 0) {
-
-                int reducedTransitions = Math.max(originalTransitions - 2, 0);
-                int reversedCost = n + reducedTransitions;
-
-                if (s.charAt(0) == '1' && s.charAt(n - 1) == '0') {
-                    reversedCost += 1;
-                } else if (s.charAt(0) == '0' && s.charAt(n - 1) == '1') {
-                    reversedCost += 1;
-                } else {
-                    reversedCost += (s.charAt(0) == '1' ? 1 : 0);
-                }
-                bestCost = Math.min(bestCost, reversedCost);
-            }
-
-            bw.write(bestCost + "\n");
+            System.out.println(possible ? "YES" : "NO");
         }
-        bw.flush();
     }
 }
