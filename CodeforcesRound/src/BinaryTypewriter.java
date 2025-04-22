@@ -1,48 +1,37 @@
 import java.util.*;
 
-class MedianSplits {
+class BinaryTypewriter {
     public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        int t = sc.nextInt(); // number of test cases
+        Scanner in = new Scanner(System.in);
+        int t = in.nextInt();
         while (t-- > 0) {
-            int n = sc.nextInt();
-            int k = sc.nextInt();
-            int[] a = new int[n];
-            boolean hasK = false;
+            int n = in.nextInt();
+            String s = in.next();
 
-            for (int i = 0; i < n; i++) {
-                a[i] = sc.nextInt();
-                if (a[i] == k) hasK = true;
-            }
+            int cost = n + (s.charAt(0) =='1'?1:0);
+            int first01 = n,first10=n;
+            int last01 = -1, last10 = -1;
 
-            // If no element is equal to k, then we can't form such a split
-            if (!hasK) {
-                System.out.println("NO");
-                continue;
-            }
-
-            // For n == 3, we just check directly
-            if (n == 3) {
-                int[] temp = Arrays.copyOf(a, n);
-                Arrays.sort(temp);
-                int median = temp[1];
-                System.out.println(median <= k ? "YES" : "NO");
-                continue;
-            }
-
-            boolean possible = false;
-            for (int i = 0; i < n - 1; i++) {
-                if (a[i] <= k && a[i + 1] <= k) {
-                    possible = true;
-                    break;
-                }
-                if (i + 2 < n && a[i] <= k && a[i + 2] <= k) {
-                    possible = true;
-                    break;
+            for (int i = 0; i < n-1; i++) {
+                if (s.charAt(i)!=s.charAt(i+1)) cost++;
+                if(s.charAt(i)=='0' && s.charAt(i+1)=='1'){
+                    first01 = Math.min(first01,i);
+                    last01 = Math.max(last01,i);
+                }else if(s.charAt(i)=='1' && s.charAt(i+1)=='0'){
+                    first10 = Math.min(first10,i);
+                    last10 = Math.max(last10,i);
                 }
             }
 
-            System.out.println(possible ? "YES" : "NO");
+            if (last01 - first01 >=2 || last10 - first10>=2){
+                cost -=2;
+            }
+
+            else if (s.charAt(0)=='1' && last01!=-1) cost -=2;
+            else if (s.charAt(0)=='1' && last10!=-1) cost -=1;
+            else if (s.charAt(0)=='0' && s.charAt(n-1)=='0' && last01!=-1) cost -=1;
+
+            System.out.println(cost);
         }
     }
 }
