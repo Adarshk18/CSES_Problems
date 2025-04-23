@@ -1,40 +1,71 @@
 import java.util.*;
 
-public class WordCombinations {
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
+import java.io.*;
+public class WordCombinations{
 
-        // Input
-        String s = scanner.nextLine();
-        int n = s.length();
-        int k = Integer.parseInt(scanner.nextLine());
-        String[] words = new String[k];
-        for (int i = 0; i < k; i++) {
-            words[i] = scanner.nextLine();
+    static int[][] trie = new int[5000005][27];
+    static boolean[] isEnd = new boolean[5000005];
+    static int counter = 0;
+    static int[] dp = new int[5000005];
+    int MOD = 100000007;
+
+    static String s;
+
+    //Function to insert a word in trie
+    void insert(String str){
+        int curr = 0;
+        System.out.println("Hello");
+        int n = str.length();
+        for(int i=0;i<n;i++){
+            if(trie[curr][str.charAt(i)-'a'] == 0)trie[curr][str.charAt(i)-'a'] = ++counter;
+            curr = trie[curr][str.charAt(i)-'a'];
+        }
+        isEnd[curr]=true;
+    }
+
+    //Function to search for a word in a trie
+    int wordCombinations(int index){
+        if(index == s.length()){
+            System.out.println(s.length());
+            return dp[s.length()]=1;
         }
 
-        // Constants
-        final long MOD = 1_000_000_007;
+        int node = 0;
+        int ans=0;
 
-        // DP array
-        long[] dp = new long[n + 1];
-        dp[0] = 1; // Base case: one way to form empty string
-
-        // For each position i in the string
-        for (int i = 1; i <= n; i++) {
-            // Try each word in the dictionary
-            for (String word : words) {
-                int len = word.length();
-                // Check if the word can be placed ending at position i
-                if (i >= len && s.substring(i - len, i).equals(word)) {
-                    dp[i] = (dp[i] + dp[i - len]) % MOD;
-                }
+        for(int i=index;i<s.length();i++){
+            if(trie[node][s.charAt(i)-'a']==0)return dp[index]=ans;
+            node = trie[node][s.charAt(i)-'a'];
+            if(isEnd[node]){
+                if(dp[i+1] != -1)ans = (ans + dp[i+1])%MOD;
+                else ans = (ans + search(i+1))%MOD;
             }
         }
 
-        // Output the result
-        System.out.println(dp[n]);
+        return dp[index] = ans;
+    }
 
-        scanner.close();
+
+
+
+    //Driver code
+    public static void main(String args[]){
+        Scanner myObj = new Scanner(System.in);
+
+        int k;
+        s = myObj.nextLine();
+        k = myObj.nextInt();
+        WordCombinations wc = new WordCombinations();
+        System.out.println(k);
+        for(int i=0;i<=k;i++){
+            String str = myObj.nextLine();
+
+            wc.insert(str);
+        }
+        Arrays.fill(dp, -1);
+        Arrays.fill(isEnd,false);
+        dp[0] = wc.search(0);
+
+        System.out.println(wc.search(0));
     }
 }
