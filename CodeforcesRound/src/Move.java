@@ -2,46 +2,28 @@ import java.io.*;
 import java.util.*;
 
 public class Move {
-    public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        PrintWriter out = new PrintWriter(System.out);
-        int t = Integer.parseInt(br.readLine());
+    public static void main(String[] args){
+        Scanner in = new Scanner(System.in);
+        int t = in.nextInt();
 
-        while (t-- > 0) {
-            int n = Integer.parseInt(br.readLine());
-            String[] parts = br.readLine().split(" ");
+        while(t-->0){
+            int n = in.nextInt();
             long[] a = new long[n];
             for (int i = 0; i < n; i++) {
-                a[i] = Long.parseLong(parts[i]);
+                a[i] = in.nextLong();
             }
+            long[] pref = new long[n];
 
-            // Initialize suffix sum array
-            long[] suffix = new long[n + 1];
-            suffix[n] = 0;
-
-            for (int i = n - 1; i >= 0; i--) {
-                suffix[i] = suffix[i + 1] + a[i];
+            pref[0] = a[0];
+            for (int i = 1; i < n; i++) {
+                pref[i] = Math.max(pref[i-1], a[i]);
             }
-
-            long[] result = new long[n];
-            for (int k = 1; k <= n; k++) {
-                long maxSum = Long.MIN_VALUE;
-
-                // Try moving each element to the end and calculate the sum of the last k elements
-                for (int i = 0; i <= n - k; i++) {
-                    long sum = suffix[n - k] + a[i];
-                    maxSum = Math.max(maxSum, sum);
-                }
-
-                result[k - 1] = maxSum;
+            long sum =0;
+            for (int i = n-1; i >= 0; i--) {
+                System.out.print(sum + pref[i] + " ");
+                sum += a[i];
             }
-
-            // Output the result
-            for (long res : result) {
-                out.print(res + " ");
-            }
-            out.println();
+            System.out.println();
         }
-        out.flush();
     }
 }
