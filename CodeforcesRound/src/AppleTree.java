@@ -1,185 +1,202 @@
 import java.util.*;
 
 public class AppleTree {
-    static List<List<Integer>> adj = new ArrayList<>();
-    static int[] removed;
-    static int[] seen_id, distA, parentA, distB, distU, parentU;
-    static int bfs_id;
-    static List<Integer> comp_nodes;
 
-    static class Comp {
-        int d, u, v;
-        List<Integer> path;
+    static class Segment implements Comparable<Segment> {
+        int depth, first, second;
+        List<Integer> route;
 
-        Comp(int d, int u, int v, List<Integer> path) {
-            this.d = d;
-            this.u = u;
-            this.v = v;
-            this.path = path;
+        Segment(int depth, int first, int second, List<Integer> route) {
+            this.depth = depth;
+            this.first = first;
+            this.second = second;
+            this.route = route;
+        }
+
+        @Override
+        public int compareTo(Segment other) {
+            if (this.depth != other.depth) return other.depth - this.depth;
+            if (this.first != other.first) return other.first - this.first;
+            return other.second - this.second;
         }
     }
 
-    static class CompareComp implements Comparator<Comp> {
-        public int compare(Comp a, Comp b) {
-            if (a.d != b.d) return Integer.compare(a.d, b.d);
-            if (a.u != b.u) return Integer.compare(a.u, b.u);
-            return Integer.compare(a.v, b.v);
-        }
-    }
+    static List<Integer>[] graph;
+    static boolean[] isActive;
+    static int[] componentMarker, visitMarker, distance, distanceFromA, distanceFromB, backtrack;
+    static int compLabel = 0, distLabel = 0;
 
-    public static int BFS_findFarthest(int start) {
-        bfs_id++;
-        int id = bfs_id;
-        Queue<Integer> q = new LinkedList<>();
-        q.add(start);
-        seen_id[start] = id;
-        distA[start] = 0;
-        int far = start, maxd = 0;
-        while (!q.isEmpty()) {
-            int x = q.poll();
-            for (int y : adj.get(x)) {
-                if (removed[y] == 0 && seen_id[y] != id) {
-                    seen_id[y] = id;
-                    distA[y] = distA[x] + 1;
-                    q.add(y);
-                    if (distA[y] > maxd) {
-                        maxd = distA[y];
-                        far = y;
-                    }
+    static Segment handleBranch(int base) {
+        compLabel++;
+        Queue<Integer> queue = new LinkedList<>();
+        List<Integer> subComponent = new ArrayList<>();
+        queue.add(base);
+        componentMarker[base] = compLabel;
+        subComponent.add(base);
+
+        while (!queue.isEmpty()) {
+            int node = queue.poll();
+            for (int neighbor : graph[node]) {
+                if (isActive[neighbor] && componentMarker[neighbor] != compLabel) {
+                    componentMarker[neighbor] = compLabel;
+                    queue.add(neighbor);
+                    subComponent.add(neighbor);
                 }
             }
         }
-        return far;
-    }
 
-    public static int BFS_distParentCompNodes(int start, List<Integer> comp_nodes) {
-        bfs_id++;
-        int id = bfs_id;
-        Queue<Integer> q = new LinkedList<>();
-        q.add(start);
-        seen_id[start] = id;
-        distA[start] = 0;
-        parentA[start] = -1;
-        int far = start, maxd = 0;
-        comp_nodes.clear();
-        comp_nodes.add(start);
-        while (!q.isEmpty()) {
-            int x = q.poll();
-            for (int y : adj.get(x)) {
-                if (removed[y] == 0 && seen_id[y] != id) {
-                    seen_id[y] = id;
-                    distA[y] = distA[x] + 1;
-                    parentA[y] = x;
-                    q.add(y);
-                    comp_nodes.add(y);
-                    if (distA[y] > maxd) {
-                        maxd = distA[y];
-                        far = y;
-                    }
+        distLabel++;
+        int origin = subComponent.get(0);
+        queue.add(origin);
+        visitMarker[origin] = distLabel;
+        distance[origin] = 0;
+        while (!queue.isEmpty()) {
+            int current = queue.poll();
+            for (int neighbor : graph[current]) {
+                if (isActive[neighbor] && visitMarker[neighbor] != distLabel) {
+                    visitMarker[neighbor] = distLabel;
+                    distance[neighbor] = distance[current] + 1;
+                    queue.add(neighbor);
                 }
             }
         }
-        return far;
-    }
 
-    public static void BFS_distOnly(int start) {
-        bfs_id++;
-        int id = bfs_id;
-        Queue<Integer> q = new LinkedList<>();
-        q.add(start);
-        seen_id[start] = id;
-        distB[start] = 0;
-        while (!q.isEmpty()) {
-            int x = q.poll();
-            for (int y : adj.get(x)) {
-                if (removed[y] == 0 && seen_id[y] != id) {
-                    seen_id[y] = id;
-                    distB[y] = distB[x] + 1;
-                    q.add(y);
+        int A = origin;
+        for (int node : subComponent)
+            if (distance[node] > distance[A]) A = node;
+
+        distLabel++;
+        queue.add(A);
+        visitMarker[A] = distLabel;
+        distance[A] = 0;
+        backtrack[A] = -1;
+
+        while (!queue.isEmpty()) {
+            int current = queue.poll();
+            for (int neighbor : graph[current]) {
+                if (isActive[neighbor] && visitMarker[neighbor] != distLabel) {
+                    visitMarker[neighbor] = distLabel;
+                    distance[neighbor] = distance[current] + 1;
+                    backtrack[neighbor] = current;
+                    queue.add(neighbor);
                 }
             }
         }
-    }
 
-    public static int BFS_distParentLexFarthest(int start) {
-        bfs_id++;
-        int id = bfs_id;
-        Queue<Integer> q = new LinkedList<>();
-        q.add(start);
-        seen_id[start] = id;
-        distU[start] = 0;
-        parentU[start] = -1;
-        int far = start, maxd = 0;
-        while (!q.isEmpty()) {
-            int x = q.poll();
-            for (int y : adj.get(x)) {
-                if (removed[y] == 0 && seen_id[y] != id) {
-                    seen_id[y] = id;
-                    distU[y] = distU[x] + 1;
-                    parentU[y] = x;
-                    q.add(y);
-                    if (distU[y] > maxd || (distU[y] == maxd && y > far)) {
-                        maxd = distU[y];
-                        far = y;
-                    }
+        for (int node : subComponent)
+            distanceFromA[node] = distance[node];
+
+        int B = subComponent.get(0);
+        for (int node : subComponent)
+            if (distanceFromA[node] > distanceFromA[B]) B = node;
+
+        int edgeLength = distanceFromA[B];
+
+        distLabel++;
+        queue.add(B);
+        visitMarker[B] = distLabel;
+        distance[B] = 0;
+
+        while (!queue.isEmpty()) {
+            int current = queue.poll();
+            for (int neighbor : graph[current]) {
+                if (isActive[neighbor] && visitMarker[neighbor] != distLabel) {
+                    visitMarker[neighbor] = distLabel;
+                    distance[neighbor] = distance[current] + 1;
+                    queue.add(neighbor);
                 }
             }
         }
-        return far;
-    }
 
-    public static Comp get_comp(int start) {
-        int A1 = BFS_findFarthest(start);
-        int B1 = BFS_distParentCompNodes(A1, comp_nodes);
-        BFS_distOnly(B1);
-        int D = distA[B1];
-        int u_max = 0;
-        for (int u : comp_nodes) {
-            if (distA[u] == D || distB[u] == D) {
-                if (u > u_max) u_max = u;
+        for (int node : subComponent)
+            distanceFromB[node] = distance[node];
+
+        int topNode = -1;
+        for (int node : subComponent) {
+            if (Math.max(distanceFromA[node], distanceFromB[node]) == edgeLength && node > topNode)
+                topNode = node;
+        }
+
+        distLabel++;
+        queue.add(topNode);
+        visitMarker[topNode] = distLabel;
+        distance[topNode] = 0;
+        backtrack[topNode] = -1;
+
+        while (!queue.isEmpty()) {
+            int current = queue.poll();
+            for (int neighbor : graph[current]) {
+                if (isActive[neighbor] && visitMarker[neighbor] != distLabel) {
+                    visitMarker[neighbor] = distLabel;
+                    distance[neighbor] = distance[current] + 1;
+                    backtrack[neighbor] = current;
+                    queue.add(neighbor);
+                }
             }
         }
-        int v_max = BFS_distParentLexFarthest(u_max);
-        List<Integer> P = new ArrayList<>();
-        int x = v_max;
-        while (x != -1) {
-            P.add(x);
-            x = parentU[x];
+
+        int farNode = -1;
+        for (int node : subComponent) {
+            if (distance[node] == edgeLength && node > farNode)
+                farNode = node;
         }
-        return new Comp(P.size(), u_max, v_max, P);
+
+        List<Integer> path = new ArrayList<>();
+        for (int current = farNode; current != -1; current = backtrack[current])
+            path.add(current);
+
+        return new Segment(edgeLength + 1, topNode, farNode, path);
     }
 
     public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
+        Scanner scanner = new Scanner(System.in);
+        int scenarios = scanner.nextInt();
 
-        int t = sc.nextInt();
-        while (t-- > 0) {
-            // Initialize data structures for each test case
-            int n = sc.nextInt();
-            adj.clear();
-            removed = new int[n + 1];
-            seen_id = new int[n + 1];
-            distA = new int[n + 1];
-            parentA = new int[n + 1];
-            distB = new int[n + 1];
-            distU = new int[n + 1];
-            parentU = new int[n + 1];
-            comp_nodes = new ArrayList<>();
+        while (scenarios-- > 0) {
+            int nodes = scanner.nextInt();
+            graph = new ArrayList[nodes + 1];
+            for (int i = 0; i <= nodes; i++) graph[i] = new ArrayList<>();
 
-            for (int i = 0; i <= n; i++) {
-                adj.add(new ArrayList<>());
+            for (int i = 1; i < nodes; i++) {
+                int u = scanner.nextInt();
+                int v = scanner.nextInt();
+                graph[u].add(v);
+                graph[v].add(u);
             }
 
-            for (int i = 1; i < n; i++) {
-                int u = sc.nextInt();
-                int v = sc.nextInt();
-                adj.get(u).add(v);
-                adj.get(v).add(u);
+            isActive = new boolean[nodes + 1];
+            Arrays.fill(isActive, true);
+            componentMarker = new int[nodes + 1];
+            visitMarker = new int[nodes + 1];
+            distance = new int[nodes + 1];
+            distanceFromA = new int[nodes + 1];
+            distanceFromB = new int[nodes + 1];
+            backtrack = new int[nodes + 1];
+
+            PriorityQueue<Segment> segmentQueue = new PriorityQueue<>();
+            segmentQueue.add(handleBranch(1));
+
+            List<int[]> results = new ArrayList<>();
+
+            while (!segmentQueue.isEmpty()) {
+                Segment seg = segmentQueue.poll();
+                results.add(new int[]{seg.depth, seg.first, seg.second});
+                for (int x : seg.route) isActive[x] = false;
+                for (int x : seg.route) {
+                    for (int y : graph[x]) {
+                        if (isActive[y]) {
+                            segmentQueue.add(handleBranch(y));
+                        }
+                    }
+                }
             }
 
-            // Call get_comp() or any other function you want to execute
-            Comp c0 = get_comp(1);
-            System.out.println(c0.d + " " + c0.u + " " + c0.v);
+            for (int[] result : results) {
+                System.out.print(result[0] + " " + result[1] + " " + result[2] + " ");
+            }
+            System.out.println();
         }
+
+        scanner.close();
     }
 }
