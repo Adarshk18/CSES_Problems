@@ -32,7 +32,7 @@ public class Perspective {
             int mx = -1;
 
             for(Pair p: ls){
-                if (p.a>mx){
+                if (p.a>=mx){
                     ans.add(p.index+1);
                     mx = p.b;
                 }
