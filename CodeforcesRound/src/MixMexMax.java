@@ -35,7 +35,6 @@ public class MixMexMax {
             for (int i = 0; i < n; i++) {
                 a.add(sc.nextInt());
             }
-
             System.out.println(isGood(a) ? "YES" : "NO");
         }
 
