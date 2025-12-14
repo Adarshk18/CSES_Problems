@@ -29,6 +29,6 @@ public class Combination2 {
             coins[i] = sc.nextInt();
         }
 
-        System.out.println(countWaysOptimized(coins,x));
+        System.out.println(countWaysOptimized(coins, x));
     }
 }
