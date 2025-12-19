@@ -1,64 +1,65 @@
+import java.io.*;
 import java.util.*;
 
 public class MinimalGridPath {
-    public static void main(String[] args) {
-        Scanner in = new Scanner(System.in);
 
-        int n = in.nextInt();
+    static class Cell {
+        int i, j;
+        Cell(int i, int j) {
+            this.i = i;
+            this.j = j;
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        int n = Integer.parseInt(br.readLine());
+
         char[][] grid = new char[n][n];
         for (int i = 0; i < n; i++) {
-            grid[i] = in.next().toCharArray();
+            grid[i] = br.readLine().toCharArray();
         }
 
-        boolean[][] curr = new boolean[n][n];
-        boolean[][] next = new boolean[n][n];
+        StringBuilder ans = new StringBuilder();
+        ans.append(grid[0][0]);
 
-        StringBuilder sb = new StringBuilder();
-
-        curr[0][0] = true;
-        sb.append(grid[0][0]);
+        List<Cell> curr = new ArrayList<>();
+        curr.add(new Cell(0, 0));
 
         for (int step = 0; step < 2 * n - 2; step++) {
+
             char best = 'Z';
 
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < n; j++) {
-                    if (!curr[i][j]) continue;
 
-                    if (i + 1 < n) {
-                        best = (char) Math.min(best, grid[i + 1][j]);
-                    }
-
-                    if (j + 1 < n) {
-                        best = (char) Math.min(best, grid[i][j + 1]);
-                    }
+            for (Cell c : curr) {
+                int i = c.i, j = c.j;
+                if (i + 1 < n) best = (char) Math.min(best, grid[i + 1][j]);
+                if (j + 1 < n) best = (char) Math.min(best, grid[i][j + 1]);
+            }
 
 
+            List<Cell> next = new ArrayList<>();
+            boolean[][] used = new boolean[n][n];
+
+            for (Cell c : curr) {
+                int i = c.i, j = c.j;
+
+                if (i + 1 < n && grid[i + 1][j] == best && !used[i + 1][j]) {
+                    used[i + 1][j] = true;
+                    next.add(new Cell(i + 1, j));
+                }
+
+                if (j + 1 < n && grid[i][j + 1] == best && !used[i][j + 1]) {
+                    used[i][j + 1] = true;
+                    next.add(new Cell(i, j + 1));
                 }
             }
 
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < n; j++) {
-                    if (!curr[i][j]) continue;
-
-                    if (i + 1 < n && grid[i + 1][j] == best) {
-                        next[i + 1][j] = true;
-                    }
-
-                    if (j + 1 < n && grid[i][j + 1] == best) {
-                        next[i][j + 1] = true;
-                    }
-                }
-            }
-            sb.append(best);
-            boolean[][] temp = curr;
+            ans.append(best);
             curr = next;
-            next = temp;
-
-            for (int i = 0; i < n; i++) {
-                Arrays.fill(next[i], false);
-            }
         }
-        System.out.println(sb.toString());
+
+        System.out.println(ans.toString());
     }
 }
