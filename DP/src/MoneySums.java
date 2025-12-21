@@ -12,12 +12,12 @@ public class MoneySums {
             maxCoin += coins[i];
         }
 
-        boolean[] prev = new boolean[maxCoin+1];
+        boolean[] prev = new boolean[maxCoin + 1];
         prev[0] = true;
 
-        for(int coin: coins){
+        for (int coin : coins) {
             for (int s = maxCoin; s >= coin; s--) {
-                prev[s] |= prev[s-coin];
+                prev[s] |= prev[s - coin];
             }
         }
 
@@ -27,6 +27,6 @@ public class MoneySums {
         }
 
         System.out.println(res.size());
-        for(int x: res) System.out.print(x+" ");
+        for (int x : res) System.out.print(x + " ");
     }
 }
