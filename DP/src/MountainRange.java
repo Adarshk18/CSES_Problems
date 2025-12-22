@@ -4,57 +4,44 @@ public class MountainRange {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         int n = sc.nextInt();
+        long[] h = new long[n];
 
-        int[] h = new int[n];
         for (int i = 0; i < n; i++) {
-            h[i] = sc.nextInt();
+            h[i] = sc.nextLong();
         }
 
-        int[] left = new int[n];
-        int[] right = new int[n];
+        // dp[i] = maximum mountains starting from i
+        int[] dp = new int[n];
+        int maxAns = 1;
 
-        Deque<Integer> stack = new ArrayDeque<>();
+        // Process from right to left
+        for (int i = n - 1; i >= 0; i--) {
+            dp[i] = 1;
 
+            // Use a stack to efficiently find reachable positions
+            // We want to find all j > i where h[i] > h[j] and h[i] > max(h[i+1..j-1])
+            Stack<Integer> stack = new Stack<>();
+            long maxSeen = 0;
 
-        // Traverse from left to right
-        for (int i = 0; i < n; i++) {
-            int cnt =0;
+            for (int j = i + 1; j < n; j++) {
+                // Check if we can reach j from i
+                if (h[i] > h[j] && h[i] > maxSeen) {
+                    dp[i] = Math.max(dp[i], 1 + dp[j]);
+                }
 
-            while (!stack.isEmpty() && h[i] > h[stack.peek()]) {
-                cnt++;
-                stack.pop();
+                // Update the maximum seen so far
+                maxSeen = Math.max(maxSeen, h[j]);
+
+                // Early termination: if maxSeen >= h[i], we can't reach anything beyond
+                if (maxSeen >= h[i]) {
+                    break;
+                }
             }
 
-            if (!stack.isEmpty()){
-                cnt++;
-            }
-            left[i] = cnt;
-            stack.push(i);
+            maxAns = Math.max(maxAns, dp[i]);
         }
 
-        stack.clear();
-
-        //cnt from right to left
-        for (int i = n-1; i >= 0; i--) {
-            int cnt=0;
-
-            while (!stack.isEmpty() && h[i] > h[stack.peek()]) {
-                cnt++;
-                stack.pop();
-            }
-
-            if (!stack.isEmpty()){
-                cnt++;
-            }
-            right[i] = cnt;
-            stack.push(i);
-        }
-
-        int ans = 0;
-        for (int i = 0; i < n; i++) {
-            ans = Math.max(ans, left[i] + right[i] + 1);
-        }
-
-        System.out.println(ans);
+        System.out.println(maxAns);
+        sc.close();
     }
 }
