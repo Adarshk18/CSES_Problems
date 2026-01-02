@@ -5,7 +5,6 @@ import java.util.*;
 public class TreeDiameter {
     static List<Integer>[] tree;
 
-
     static int bfs(int start, int n) {
         boolean[] visited = new boolean[n + 1];
         Queue<Integer> q = new ArrayDeque<>();
