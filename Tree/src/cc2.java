@@ -34,7 +34,7 @@ public class cc2 {
 
         dfs(1,0);
 
-        while (q-->-0){
+        while (q-->0){
             st = new StringTokenizer(br.readLine());
             int a = Integer.parseInt(st.nextToken());
             int b = Integer.parseInt(st.nextToken());
@@ -43,17 +43,29 @@ public class cc2 {
         out.flush();
     }
 
-    static void dfs(int v, int parent){
-        up[v][0] = parent;
-        for (int i = 1; i < LOG; i++) {
-            up[v][i] = up [ up[v][i-1] ][i-1];
-        }
+    static void dfs(int root, int parent) {
 
-        for(int child: tree[v]){
-            depth[child] = depth[v]+1;
-            dfs(child,v);
+        Deque<Integer> stack = new ArrayDeque<>();
+        stack.push(root);
+
+        up[root][0] = parent;
+        depth[root] = 0;
+
+        while (!stack.isEmpty()) {
+            int v = stack.pop();
+
+            for (int i = 1; i < LOG; i++) {
+                up[v][i] = up[ up[v][i - 1] ][i - 1];
+            }
+
+            for (int child : tree[v]) {
+                depth[child] = depth[v] + 1;
+                up[child][0] = v;
+                stack.push(child);
+            }
         }
     }
+
 
     static int lca(int a, int b){
         if (depth[a] < depth[b]){
